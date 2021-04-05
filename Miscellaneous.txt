@@ -1,0 +1,200 @@
+
+firebase:
+https://firebase.google.com/docs/web/setup
+https://firebase.google.com/docs/database/web/read-and-write
+https://firebase.google.com/docs/database/web/lists-of-data
+
+https://www.tutorialspoint.com/firebase/index.htm
+
+http://thejackalofjavascript.com/getting-started-with-firebase/
+
+https://stackoverflow.com/questions/39083242/firebase-web-retrieve-data
+https://stackoverflow.com/questions/38923644/firebase-update-vs-set?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+http://softauthor.com/learn-to-build-firebase-crud-app-with-javascript-part01-reading-data/#initialize-firebase-in-app-js
+http://softauthor.com/firebase-crud-javascript-web-tutorial-part-2-create-update-delete/
+
+-----
+
+clickable li elements:
+https://stackoverflow.com/questions/17773938/add-a-list-item-through-javascript?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+https://stackoverflow.com/questions/3486110/make-a-list-item-clickable-html-css?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+https://www.w3schools.com/jsref/met_document_createelement.asp
+https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+http://htmldog.com/guides/javascript/advanced/creatingelements/
+https://www.w3schools.com/js/js_htmldom_nodes.asp
+https://www.w3schools.com/jsref/met_document_createelement.asp
+https://stackoverflow.com/questions/4793604/how-to-insert-an-element-after-another-element-in-javascript-without-using-a-lib?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+li -elements:
+https://stackoverflow.com/questions/20040825/check-how-many-li-there-are-in-a-ul-with-javascript?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+https://www.sitepoint.com/community/t/looping-through-li-elements-in-ul/6049/2
+https://www.w3schools.com/jsref/prop_nodelist_length.asp
+https://www.w3schools.com/js/js_arrays.asp
+
+show firebase data in a a html table and make it clickable:
+https://stackoverflow.com/questions/44452392/show-firebase-data-in-a-html-table-with-javascript?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+https://www.google.fi/search?q=javscript+firebase+values+into+html+list&oq=javscript+firebase+values+into+html+list&aqs=chrome..69i57.23423j1j7&sourceid=chrome&ie=UTF-8
+https://www.abeautifulsite.net/adding-and-removing-elements-on-the-fly-using-javascript
+https://javascript.info/introduction-browser-events
+https://stackoverflow.com/questions/17636043/cannot-add-click-events-to-list-items?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+https://stackoverflow.com/questions/29847521/how-to-make-entire-list-item-clickable
+https://stackoverflow.com/questions/3486110/make-a-list-item-clickable-html-css?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+https://stackoverflow.com/questions/44452392/show-firebase-data-in-a-html-table-with-javascript?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+other:
+https://www.c-sharpcorner.com/article/create-free-charts-using-chart-js-in-asp-net-mvc/
+
+-----
+
+Pisteet laskettuna:
+	
+	<fieldset>
+		<legend>Pisteet </legend>
+		<p id="tul">Tulokset: <br><br><br><br><br><br><br><br><br><br><br></p>
+		<p id="yht">Yhteensä: </p>
+	</fieldset>
+			
+			document.getElementById("tulos_button").onclick = function () {
+				var tulokset = { 
+					tulos1: null,
+					tulos2: null,
+					tulos3: null,
+					tulos4: null,
+					tulos5: null,
+					tulos6: null,
+					tulos7: null,
+					tulos8: null,
+					tulos9: null,
+					tulos10: null,
+				};
+				
+				document.getElementById("tul").innerHTML = "Tulokset: ";
+				document.getElementById("yht").innerHTML = "<br>Yhteensä: ";
+			
+				var form_options = document.getElementById("tulokset_form");
+				var yhteensa = 0;
+				
+				for (var i = 1; i < form_options.length - 1 ;i++) {
+					var s =  "<br>" + form_options.elements[i].value;
+					
+					document.getElementById("tul").innerHTML += s;
+					
+					yhteensa += parseInt(form_options.elements[i].value);
+					
+					var tulos_variable = "tulos" + i;
+					tulokset[tulos_variable] = form_options.elements[i].value;
+				}
+				
+				// If yhteensa is Not a Number or less than one or greater than 10
+				if (isNaN(yhteensa) || yhteensa < 0 || yhteensa > 100) {
+					document.getElementById("yht").innerHTML += "<br>Not a number :^(<br>Syötä kaikki tulokset.";
+				} else {
+					document.getElementById("yht").innerHTML += yhteensa;
+					console.log(tulokset["tulos2"]);
+				}
+			};
+
+
+
+-----
+
+
+
+    <!-- show user module -->
+    <ul id="user-list"></ul>
+    <div id="user-detail"></div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+
+
+				/*
+				var currentdate = new Date();
+				firebase.database().ref('veikka-projekti/' + currentdate.toDateString() + "/").set({
+				viesti: "huipputulos, harmi et oli vaan testi",
+				date: currentdate,
+				tulos1: 10,
+				tulos2: 10,
+				tulos3: 10,
+				tulos4: 10,
+				tulos5: 10,
+				tulos6: 10,
+				tulos7: 10,
+				tulos8: 10,
+				tulos9: 10,
+				tulos10: 10
+				});
+				*/
+				
+				// Update tulos_counter
+				/*var new_id = firebase.database().ref('veikka-projekti/id').once('value');
+				new_id += 1;
+				firebase.database().ref('veikka-projekti/id').update({id: new_id});*/
+
+
+						// onclick: setChart() ,
+						/*
+						var att = document.createAttribute("onclick");
+						att.onclick = setChart(i);
+						tulosItem.setAttributeNode(att);
+						tulosItem.appendChild(document.createTextNode(i));
+						*/
+						
+						
+						console.log(tulokset[0].Tulos0);
+
+
+			firebase.database().ref('veikka-projekti').once('value').then(function(snapshotId) {
+
+	
+		&:hover {
+				cursor: pointer;
+				.card-front { 
+					@include transform(rotateX(50deg));
+					@include transform3d(perspective($perspective) rotateX(50deg)); 
+				}
+				.card-back { 
+					z-index: 950;
+					@include transform(rotateX(0deg));
+					@include transform3d(perspective($perspective) rotateX(0deg)); 
+				}
+	
+	text-decoration: none;
+	color: #000;
+ 
+	-webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+	-moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+	-o-transition: font-size 0.3s ease, background-color 0.3s ease;
+	-ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+	transition: font-size 0.3s ease, background-color 0.3s ease;
+
+var items = tulokset.getElementsByTagName('li');
+			for (var i = 0; i < items.length; i++){
+				items[i].style.backgroundColor = "#DDD";
+				items[i].addEventListener("click", function(e){
+					if(e.target && e.target.nodeName == "li"){
+						console.log(e.target.id + " was clicked!");
+					}
+				});
+				//items[i].onclick = setChart(i);
+			}
+
+-----
+
+tulokset mean:
+				
+				var mean = parseInt(tuloksetLista[i].Tulos0) + parseInt(tuloksetLista[i].Tulos1)
+				+ parseInt(tuloksetLista[i].Tulos2) + parseInt(tuloksetLista[i].Tulos3)
+				+ parseInt(tuloksetLista[i].Tulos4) + parseInt(tuloksetLista[i].Tulos5)
+				+ parseInt(tuloksetLista[i].Tulos6) + parseInt(tuloksetLista[i].Tulos7)
+				+ parseInt(tuloksetLista[i].Tulos8) + parseInt(tuloksetLista[i].Tulos9)
+				
+				mean /= 10
+				
+				labelColor = Math.round(mean)
+				
+				console.log(borderColors['Tulos' + tuloksetLista[i]['Tulos' + labelColor]])
+
+				chart.options.legend.labels.fontColor = borderColors['Tulos' + tuloksetLista[i]['Tulos' + labelColor]];

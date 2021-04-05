@@ -1,0 +1,211 @@
+<html>
+<!DOCTYPE html>
+	<head>
+		<meta http-equiv="content-type" content="text/html" charset="utf-8"> 
+		<link type="text/css" rel="stylesheet" href="css/pisteet_stylesheet.css"/>
+		<title>Pisteet</title>
+		<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-firestore.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-messaging.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-functions.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	</head>
+	<body>
+	
+		<div id="navBar">
+			<button id="homepage" class="navBarButtons">Pisteet</button>
+			<button id="scores" class="navBarButtons">Tulokset</button>
+			
+			<div class="styleButtonsBar">
+				<button id="lightStyle">Vaalea Tyyli</button>
+				<button id="darkStyle">Tumma Tyyli</button>
+			</div>
+		</div>
+		
+		<div id="contentBar">
+			<h2 id="title">Pisteet</h2>
+			<div id="formDiv">
+				<form id="tuloksetForm" onsubmit="return false" autocomplete="off">
+					<fieldset>
+						<input type="text" id="firstTulos" name="Tulos1" class="user_input" data-name="Tulos0" required></form><br>
+						<input type="text" name="Tulos2" class="user_input" data-name="Tulos1" required></form><br>
+						<input type="text" name="Tulos3" class="user_input" data-name="Tulos2" required></form><br>
+						<input type="text" name="Tulos4" class="user_input" data-name="Tulos3" required></form><br>
+						<input type="text" name="Tulos5" class="user_input" data-name="Tulos4" required></form><br>
+						<input type="text" name="Tulos6" class="user_input" data-name="Tulos5" required></form><br>
+						<input type="text" name="Tulos7" class="user_input" data-name="Tulos6" required></form><br>
+						<input type="text" name="Tulos8" class="user_input" data-name="Tulos7" required></form><br>
+						<input type="text" name="Tulos9" class="user_input" data-name="Tulos8" required></form><br>
+						<input type="text" name="Tulos10" class="user_input" data-name="Tulos9" required></form><br>
+						<br>
+						<div class="popup">
+							<span class="popUpText" id="tulosPopUp">Tulos syötetty!</span>
+						</div>
+						<input type="button" id="tulosButton" value="Syötä Tulos"></form>
+					</fieldset>
+				</form>
+			</div>
+			<div id="infoDiv">
+				<form id="commentForm" onsubmit="return false" autocomplete="off">
+					<textarea name="Kommentti" id="commentTextArea" class="user_input" data-name="Kommentti" cols="1" rows="1" placeholder="Kommentti..."></textarea>
+				</form>
+			</div>
+		</div>
+	
+		<script type="text/javascript">
+			
+			// Initialize Firebase Database
+			var config = {
+			apiKey: "AIzaSyBDUyt8Mi44EZbDZ36iVSPzX3tRzb80o9Q",
+			authDomain: "veikka-projekti.firebaseapp.com",
+			databaseURL: "https://veikka-projekti.firebaseio.com",
+			projectId: "veikka-projekti",
+			storageBucket: "veikka-projekti.appspot.com",
+			messagingSenderId: "1095261249317"
+			};
+			firebase.initializeApp(config);
+	
+			var database = firebase.database();
+			
+			// Style
+			if ( localStorage.getItem("Style") == null ) {
+				localStorage.setItem("Style", "Light")
+			}
+			
+			if ( localStorage.getItem("Style") == "Light" ) {
+				setLightStyle();
+			}
+			
+			if ( localStorage.getItem("Style") == "Dark" ) {
+				setDarkStyle();
+			}
+			
+			// Hide popup
+			$(".popup").hide();
+			
+			// Syötä Tulos -button clicked
+			document.getElementById("tulosButton").onclick = function () {
+				
+				firebase.database().ref('veikka-projekti').once('value').then(function(snapshot) {
+				
+				  // Update index
+				  var newId = snapshot.val().id;
+				  newId += 1;
+				  firebase.database().ref('veikka-projekti').update({id: newId});
+				
+					// Get user inputs
+					var userInputs = document.getElementsByClassName("user_input");
+					var newTulos = {};
+					for (var i = 0; i < userInputs.length; i++){
+						var name = userInputs[i].getAttribute('data-name');
+						var value = userInputs[i].value;
+						newTulos[name] = value;
+					}
+					
+					// Get current time
+					var now = new Date();
+					var daylist = ["Sunnuntai","Maanantai","Tiistai","Keskiviikko ","Torstai","Perjantai","Lauantai"];
+					var time = now.getHours() + ':' + now.getMinutes() + ' ' + daylist[now.getDay()] + ' ' + now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear();
+					
+					// Add current time
+					newTulos['Aika'] = time;
+					
+					// Reset form
+					document.getElementById("tuloksetForm").reset();
+					
+					// Reset textarea
+					document.getElementById("commentTextArea").value = ''; 
+					
+					// Push new score to Database
+					firebase.database().ref('veikka-projekti/tulokset/' + newId).set(newTulos);
+				});
+				
+				makeTulosPopUp();
+				
+			}
+			
+			// Navbar buttons
+			// Pisteet
+			document.getElementById("homepage").onclick = function setStyle(){
+				location.href = "./Pisteet.html";
+			}
+			
+			// Taulukot
+			document.getElementById("scores").onclick = function setStyle(){
+				location.href = "./Taulukko.html";
+			}
+			
+			// Lightstyle
+			document.getElementById("lightStyle").onclick = function setStyle(){
+				localStorage.setItem("Style", "Light");
+				setLightStyle();
+			}
+			
+			// Darkstyle
+			document.getElementById("darkStyle").onclick = function setStyle(){
+				localStorage.setItem("Style", "Dark");
+				setDarkStyle();
+			}
+			
+			function setLightStyle(){
+				document.body.style.backgroundColor = "#DDD";
+				document.getElementById("title").style.color = "#000";
+				document.getElementById("navBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'grey' + ', ' + 'lightgrey' + ')';
+				document.getElementById("navBar").style.backgroundColor = "#DDD";
+				document.getElementById("navBar").style.borderColor = "#222";
+				document.getElementById("navBar").style.borderBottomColor = "lightgrey";
+				document.getElementById("contentBar").style.borderColor = "#222";
+				document.getElementById("contentBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'lightgrey' + ', ' + 'grey' + ')';
+				document.getElementById("lightStyle").style.background = "#BBB";
+				document.getElementById("darkStyle").style.background = "#BBB";
+			}
+			
+			function setDarkStyle(){
+				document.body.style.backgroundColor = "#224";
+				document.getElementById("title").style.color = "#FFF";
+				document.getElementById("navBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'midnightblue' + ', ' + 'royalblue' + ')';
+				document.getElementById("navBar").style.borderColor = "#DDD";
+				document.getElementById("navBar").style.borderBottomColor = "royalblue";
+				document.getElementById("contentBar").style.borderColor = "#DDD";
+				document.getElementById("contentBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'royalblue' + ', ' + 'midnightblue' + ')';
+				document.getElementById("lightStyle").style.background = "#33f";
+				document.getElementById("darkStyle").style.background = "#33f";
+			}
+			
+			// Browser detector
+			function getCssValuePrefix()
+			{
+				var rtrnVal = '';//default to standard syntax
+				var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
+
+				// Create a temporary DOM object for testing
+				var dom = document.createElement('div');
+
+				for (var i = 0; i < prefixes.length; i++)
+				{
+					// Attempt to set the style
+					dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
+
+					// Detect if the style was successfully set
+					if (dom.style.background)
+					{
+						rtrnVal = prefixes[i];
+					}
+				}
+
+				dom = null;
+				delete dom;
+
+				return rtrnVal;
+			}
+			
+			function makeTulosPopUp(){
+				$(".popup").css('visibility', 'visible');
+				$(".popup").fadeToggle();
+				
+				setTimeout(function(){ $(".popup").fadeToggle(); }, 2500);
+			}
+		</script>
+	</body>
+</html>

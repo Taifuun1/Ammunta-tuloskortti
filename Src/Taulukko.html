@@ -1,0 +1,318 @@
+<html>
+<!DOCTYPE html>
+	<head>
+		<meta http-equiv="content-type" content="text/html" charset="utf-8"> 
+		<link type="text/css" rel="stylesheet" href="css/taulukko_stylesheet.css"/>
+		<title>Tulokset</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-firestore.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-messaging.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-functions.js"></script>
+	</head>
+	<body>
+		
+		<div id="navBar">
+			<button id="homepage" class="navBarButtons">Pisteet</button>
+			<button id="scores" class="navBarButtons">Tulokset</button>
+			
+			<div class="styleButtonsBar">
+				<button id="lightStyle">Vaalea Tyyli</button>
+				<button id="darkStyle">Tumma Tyyli</button>
+			</div>
+		</div>
+		
+		<div id="contentBar">	
+			<div id="tuloksetBar">
+				<ul id="tulokset">
+					
+				</ul>
+			</div>
+			
+			<canvas id="chart" width="800" height="600"></canvas>
+		</div>
+	
+		<script type="text/javascript">
+			// Initialize Firebase
+			var config = {
+			apiKey: "AIzaSyBDUyt8Mi44EZbDZ36iVSPzX3tRzb80o9Q",
+			authDomain: "veikka-projekti.firebaseapp.com",
+			databaseURL: "https://veikka-projekti.firebaseio.com",
+			projectId: "veikka-projekti",
+			storageBucket: "veikka-projekti.appspot.com",
+			messagingSenderId: "1095261249317"
+			};
+			firebase.initializeApp(config);
+	
+			var database = firebase.database();
+			
+			// Style
+			if ( localStorage.getItem("Style") == null ) {
+				localStorage.setItem("Style", "Light")
+			}
+			
+			if ( localStorage.getItem("Style") == "Light" ) {
+				setLightStyle();
+			}
+			
+			if ( localStorage.getItem("Style") == "Dark" ) {
+				setDarkStyle();
+			}
+			
+			// ### Variables ###
+			
+			// Tulokset
+			var tuloksetLista = [];
+			
+			// Background Colors:
+			backgroundColors = {
+				Tulos1: 'rgba(255, 0, 0, 0.2)',
+				Tulos2: 'rgba(255, 51, 0, 0.2)',
+				Tulos3: 'rgba(255, 102, 0, 0.2)',
+				Tulos4: 'rgba(255, 153, 0, 0.2)',
+				Tulos5: 'rgba(255, 201, 0, 0.2)',
+				Tulos6: 'rgba(204, 255, 0, 0.2)',
+				Tulos7: 'rgba(153, 255, 0, 0.2)',
+				Tulos8: 'rgba(102, 255, 0, 0.2)',
+				Tulos9: 'rgba(51, 255, 0, 0.2)',
+				Tulos10: 'rgba(0, 255, 0, 0.2)'
+			}
+			
+			// BorderColors:
+			borderColors = {
+				Tulos1: 'rgba(255, 0, 0, 1)',
+				Tulos2: 'rgba(255, 51, 0, 1)',
+				Tulos3: 'rgba(255, 102, 0, 1)',
+				Tulos4: 'rgba(255, 153, 0, 1)',
+				Tulos5: 'rgba(255, 204, 0, 1)',
+				Tulos6: 'rgba(204, 255, 0, 1)',
+				Tulos7: 'rgba(153, 255, 0, 1)',
+				Tulos8: 'rgba(102, 255, 0, 1)',
+				Tulos9: 'rgba(51, 255, 0, 1)',
+				Tulos10: 'rgba(0, 255, 0, 1)'
+			}
+			
+			// Initialize chart
+			var ctx = document.getElementById("chart").getContext('2d');
+			var chart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+						labels: ["Tulos 1", "Tulos 2", "Tulos 3", "Tulos 4", "Tulos 5", "Tulos 6", "Tulos 7", "Tulos 8", "Tulos 9", "Tulos 10"],
+						datasets: [{
+							label: "Esimerkki -Tulos",
+							data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+							backgroundColor: [
+								backgroundColors.Tulos1,
+								backgroundColors.Tulos2,
+								backgroundColors.Tulos3,
+								backgroundColors.Tulos4,
+								backgroundColors.Tulos5,
+								backgroundColors.Tulos6,
+								backgroundColors.Tulos7,
+								backgroundColors.Tulos8,
+								backgroundColors.Tulos9,
+								backgroundColors.Tulos10
+							],
+							borderColor: [
+								borderColors.Tulos1,
+								borderColors.Tulos2,
+								borderColors.Tulos3,
+								borderColors.Tulos4,
+								borderColors.Tulos5,
+								borderColors.Tulos6,
+								borderColors.Tulos7,
+								borderColors.Tulos8,
+								borderColors.Tulos9,
+								borderColors.Tulos10
+							],
+							borderWidth: 4
+						}]
+					},
+					options: {
+						maintainAspectRatio: false,
+						responsive: false,
+						title: {
+							display: true,
+							text: 'Tulokset',
+							fontSize: 32,
+							fontColor: 'black'
+						},
+						legend: {
+							labels: {
+								fontSize: 18,
+								fontColor: 'black',
+								boxWidth: 0
+							}
+						},
+						scales: {
+							yAxes: [{
+								ticks: {
+									beginAtZero: true,
+									min: 0,
+									max: 10
+								}
+							}],
+							xAxes: [{
+								barPercentage: 1,
+								categoryPercentage: 0.6
+							}]
+						}
+					}
+				});;
+			
+			// Tulokset-scrollbar -lista
+			var tulosList = document.getElementById("tulokset");
+			
+			// Get tulokset from Database
+			firebase.database().ref('veikka-projekti/tulokset').once('value').then(function(snapshotTulokset){
+				var i = 0;
+				snapshotTulokset.forEach(function(childSnapshot){
+					var tulosItem = document.createElement('li');
+					tulosItem.setAttribute('id', 'Tulos' + i.toString());
+					tulosItem.setAttribute('class', 'tuloksetList');
+					var tulosPlusOneForList = i + 1;
+					tulosItem.innerHTML = '<li onclick="setChart(' + i +')">Tulos' + tulosPlusOneForList + '</li>';
+					tulosList.appendChild(tulosItem);
+					i++;
+					
+					tuloksetLista.push({
+						Tulos0: childSnapshot.val().Tulos0,
+						Tulos1: childSnapshot.val().Tulos1,
+						Tulos2: childSnapshot.val().Tulos2,
+						Tulos3: childSnapshot.val().Tulos3,
+						Tulos4: childSnapshot.val().Tulos4,
+						Tulos5: childSnapshot.val().Tulos5,
+						Tulos6: childSnapshot.val().Tulos6,
+						Tulos7: childSnapshot.val().Tulos7,
+						Tulos8: childSnapshot.val().Tulos8,
+						Tulos9: childSnapshot.val().Tulos9,
+						Kommentti: childSnapshot.val().Kommentti,
+						Aika: childSnapshot.val().Aika
+					});
+				});
+			});
+			
+			var tableContents = tulokset.getElementsByTagName('li');
+			for (var i = 0; i < tableContents.length; i++){
+				tableContents[i].style.backgroundColor = "#DDD";
+			}
+					
+			function setChart(i){
+				// Set chart colors based on score
+				var setBackgroundColors = []
+				for (var n = 0; n < 10; n++){
+					setBackgroundColors[n] = backgroundColors['Tulos' + tuloksetLista[i]['Tulos' + n]]
+				}
+				var setBorderColors = []
+				for (var n = 0; n < 10; n++){
+					setBorderColors[n] = borderColors['Tulos' + tuloksetLista[i]['Tulos' + n]]
+				}
+			
+				var j = i + 1;
+				chart.data.datasets = [{
+					label: tuloksetLista[i].Aika + ' | ' + tuloksetLista[i].Kommentti,
+					data: [tuloksetLista[i].Tulos0, tuloksetLista[i].Tulos1, tuloksetLista[i].Tulos2, tuloksetLista[i].Tulos3, tuloksetLista[i].Tulos4, tuloksetLista[i].Tulos5, tuloksetLista[i].Tulos6, tuloksetLista[i].Tulos7, tuloksetLista[i].Tulos8, tuloksetLista[i].Tulos9],
+					backgroundColor: [
+						setBackgroundColors[0],
+						setBackgroundColors[1],
+						setBackgroundColors[2],
+						setBackgroundColors[3],
+						setBackgroundColors[4],
+						setBackgroundColors[5],
+						setBackgroundColors[6],
+						setBackgroundColors[7],
+						setBackgroundColors[8],
+						setBackgroundColors[9]
+					],
+					borderColor: [
+						setBorderColors[0],
+						setBorderColors[1],
+						setBorderColors[2],
+						setBorderColors[3],
+						setBorderColors[4],
+						setBorderColors[5],
+						setBorderColors[6],
+						setBorderColors[7],
+						setBorderColors[8],
+						setBorderColors[9]
+					],
+					borderWidth: 4
+				}];
+				chart.options.legend.labels.fontSize = 18;
+				chart.options.legend.labels.boxWidth = 0;
+				chart.update();
+			}
+			
+			document.getElementById("homepage").onclick = function(){
+				location.href = "./Pisteet.html";
+			}
+			
+			document.getElementById("scores").onclick = function(){
+				location.href = "./Taulukko.html";
+			}
+			
+			// Lightstyle
+			document.getElementById("lightStyle").onclick = function setStyle(){
+				localStorage.setItem("Style", "Light");
+				setLightStyle();
+			}
+			
+			// Darkstyle
+			document.getElementById("darkStyle").onclick = function setStyle(){
+				localStorage.setItem("Style", "Dark");
+				setDarkStyle();
+			}
+			
+			function setLightStyle(){
+				document.body.style.backgroundColor = "#DDD";
+				document.getElementById("navBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'grey' + ', ' + 'lightgrey' + ')';
+				document.getElementById("navBar").style.backgroundColor = "#DDD";
+				document.getElementById("navBar").style.borderColor = "#222";
+				document.getElementById("navBar").style.borderBottomColor = "lightgrey";
+				document.getElementById("contentBar").style.borderColor = "#222";
+				document.getElementById("contentBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'lightgrey' + ', ' + 'grey' + ')';
+				document.getElementById("lightStyle").style.background = "#BBB";
+				document.getElementById("darkStyle").style.background = "#BBB";
+			}
+			
+			function setDarkStyle(){
+				document.body.style.backgroundColor = "#224";
+				document.getElementById("navBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'midnightblue' + ', ' + 'royalblue' + ')';
+				document.getElementById("navBar").style.borderColor = "#DDD";
+				document.getElementById("navBar").style.borderBottomColor = "royalblue";
+				document.getElementById("contentBar").style.borderColor = "#DDD";
+				document.getElementById("contentBar").style.background = getCssValuePrefix() + 'linear-gradient(' + 'royalblue' + ', ' + 'midnightblue' + ')';
+				document.getElementById("lightStyle").style.background = "#33f";
+				document.getElementById("darkStyle").style.background = "#33f";
+			}
+			
+			// Browser detector
+			function getCssValuePrefix()
+			{
+				var rtrnVal = '';//default to standard syntax
+				var prefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
+
+				// Create a temporary DOM object for testing
+				var dom = document.createElement('div');
+
+				for (var i = 0; i < prefixes.length; i++)
+				{
+					// Attempt to set the style
+					dom.style.background = prefixes[i] + 'linear-gradient(#000000, #ffffff)';
+
+					// Detect if the style was successfully set
+					if (dom.style.background)
+					{
+						rtrnVal = prefixes[i];
+					}
+				}
+
+				dom = null;
+				delete dom;
+
+				return rtrnVal;
+			}
+		</script>
+	</body>
+</html>
